@@ -1,1 +1,0 @@
-# payfull-wordpress-3.x
