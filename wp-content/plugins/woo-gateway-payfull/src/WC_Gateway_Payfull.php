@@ -1,9 +1,12 @@
 <?php
 
 class WC_Gateway_Payfull extends WC_Payment_Gateway {
+
     const INSTALLMENTS_TYPE_TABLE = "table";
     const INSTALLMENTS_TYPE_LIST = "list";
+
     protected static $_instance = null;
+
     private $_payfull;
     public $username = null;
     public $password = null;
@@ -11,6 +14,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
     public $endpoint = null;
     public $enable_3dSecure = 1;
     public $force_3dSecure  = 0;
+    public $force_3dSecure_debit  = 1;
     public $enable_installment = 1;
     public $enable_extra_installment = 0;
     public $enable_bkm = 0;
@@ -258,7 +262,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
                 return false;
             }
 
-            $crcy = $order->get_order_currency();
+            $crcy = $order->get_currency();
             $response = $this->payfull()->refund($xid, $amount);
 
             if(isset($response['status']) && $response['status']) {
@@ -273,8 +277,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
     }
 
     public function receipt_page($order_id) {
-        $o = new WC_Order;
-        $order = wc_get_order(isset($order_id) ? $order_id : false);
+        $order = new WC_Order(isset($order_id) ? $order_id : false);
 
         if($order===false) {
             throw new \Exception('Invalid request, the order is not recognized.');
@@ -300,14 +303,13 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
         }
 
         $this->renderView('views/payment-form.php', [
-            'this'=>$this,
             'id' => esc_attr($this->id),
             'order' => $order,
-            'args' => $args,
+            'args' => isset($args)?$args:[],
             'form' => $data,
             'total_selector' => $this->get_option('total_selector'),
             'currency_class' => $this->get_option('currency_class'),
-            'currency_symbol' => get_woocommerce_currency_symbol($order->get_order_currency()),
+            'currency_symbol' => get_woocommerce_currency_symbol($order->get_currency()),
             'custom_css' => $this->get_option('custom_css'),
             'enable_3dSecure' => intval($this->enable_3dSecure) === 1,
             'force_3dSecure' => intval($this->force_3dSecure) === 1,
@@ -350,15 +352,20 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             $installments = $installments <=0 ? 1 : $installments;
         }
 
-        $fname = $order->billing_first_name;
-        $lname = $order->billing_last_name;
+        $fname  = @$order->billing_first_name;
+        $lname  = @$order->billing_last_name;
+        $oId    = @$order->id;
+        $oEmail = @$order->billing_email;
+        $oPhone = @$order->billing_phone;
+
+
         $order->update_status('wc-pending', 'Process payment by Payfull');
 
         $request = [
             'total'                 => $order->get_total(),
-            'currency'              => $order->get_order_currency(),
+            'currency'              => $order->get_currency(),
             'installments'          => $installments,
-            'passive_data'          => $order->id,//json_encode(['order-id' => $order->id]),
+            'passive_data'          => $oId,//json_encode(['order-id' => $order->id]),
             'cc_name'               => $card['holder'],
             'cc_number'             => str_replace(' ', '', $card['pan']),
             'cc_month'              => $card['month'],
@@ -366,9 +373,9 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             'cc_cvc'                => $card['cvc'],
             'customer_firstname'    => $fname,
             'customer_lastname'     => $lname,
-            'customer_email'        => $order->billing_email,
-            'customer_phone'        => $order->billing_phone,
-            'payment_title'         => "{$fname} {$lname} | order $order->id | ".$order->get_total().$order->get_order_currency(),
+            'customer_email'        => $oEmail,
+            'customer_phone'        => $oPhone,
+            'payment_title'         => "{$fname} {$lname} | order $oId | ".$order->get_total().$order->get_currency(),
         ];
 
         $bank_id = isset($data['bank']) ? $data['bank'] : null;
@@ -389,7 +396,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
 
         if($use3d) {
             $checkout_url = $order->get_checkout_payment_url(true);
-            $return_url = add_query_arg(['order-id'=>$order->id, 'wc-api'=>'WC_Gateway_Payfull'], $checkout_url);
+            $return_url = add_query_arg(['order-id'=>$oId, 'wc-api'=>'WC_Gateway_Payfull'], $checkout_url);
 
             $request['use3d'] = 1;
             $request['return_url'] = $return_url;

@@ -9,7 +9,7 @@ $not_supported_img_path = plugins_url( 'images/payfull_creditcard_not_supported.
 .input-cc-number-master{background:rgba(0,0,0,0) url("<?php echo $master_img_path; ?>") no-repeat scroll 97% center / 7% auto!important;float:left}
 .input-cc-number-not-supported{background:rgba(0,0,0,0) url("<?php echo $not_supported_img_path; ?>") no-repeat scroll 97% center / 4% auto!important;float:left}
 .joker{border-radius:25px;font-weight:600;padding:3px 10px;background:#ff9800;color:#fff;text-transform:uppercase}
-#pf_window{max-width:500px!important}
+#pf_window{max-width:600px!important;padding: 0px}
 #payfullImage{padding:0;margin:0 auto;max-width:90px;box-shadow:none;display:block}
 #bkmLogo{padding:0;margin:0 auto;box-shadow:none}
 #pf_titleTab{height:61px!important;list-style-type:none;margin:0!important;padding:0!important;overflow:hidden;border:1px solid #ccc;background-color:#f1f1f1}

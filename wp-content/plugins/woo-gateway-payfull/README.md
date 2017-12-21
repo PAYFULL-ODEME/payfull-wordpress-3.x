@@ -1,7 +1,7 @@
 === Payfull Payment Gateway ===
 Tags: payment, payments, credit card, debit card
 Requires at least: 4.0
-Tested up to: 4.7.5
+Tested up to: 4.9.1
 Stable tag: 4.7.3
 License URI: https://www.payfull.com
 

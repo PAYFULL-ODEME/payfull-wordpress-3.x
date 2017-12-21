@@ -4,7 +4,7 @@
 wp_enqueue_script( 'wc-credit-card-form' );
 $currency       = $currency_symbol;
 $grandTotal     = $order->get_total();
-$currencyAsText = $order->get_order_currency();
+$currencyAsText = $order->get_currency();
 
 $bankImagesPath = plugins_url( 'images/', __FILE__ );
 
