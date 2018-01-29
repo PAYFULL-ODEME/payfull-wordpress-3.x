@@ -37,5 +37,7 @@ $not_supported_img_path = plugins_url( 'images/payfull_creditcard_not_supported.
 .bkmTab{padding:2px!important}
 .formTitle{margin-bottom:14px;border:2px solid #ccc;padding:8px;background-color:#ccc}
 #titleText{margin:0 auto;padding:0;display:inline-block;vertical-align:middle;font-size:19px}
-#payfullImageOnly{vertical-align:middle}
+#payfullImageOnly{vertical-align:middle;display: inline-block}
+#pf_cc_number_label,#pf_cvc_label{display: block}
+#woo_gateway_payfull-card-number,#woo_gateway_payfull-card-cvc{width: 100%}
 </style>
