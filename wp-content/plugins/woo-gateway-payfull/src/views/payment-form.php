@@ -273,7 +273,6 @@ $VALS = [
                             $('#<?php echo $IDS['use3d']; ?>').removeAttr('disabled');
                         }
 
-
                         //show bank image
                         if(bank && bank.length){
                             if(response.data.type == 'CREDIT'){
@@ -383,6 +382,8 @@ $VALS = [
                     bank = cardIssuer;
                 } else if (member != 'false') {
                     bank = member;
+                } else {
+                    bank.installments = [];
                 }
 
                 if (bank) {
