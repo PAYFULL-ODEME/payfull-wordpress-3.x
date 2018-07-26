@@ -179,7 +179,8 @@ $VALS = [
         <?php //do_action( 'woocommerce_credit_card_form_end', $this->id ); ?>
         <div class="clear"></div>
         <div id="pf_submit_div">
-        <input type="submit" value="<?php echo __( 'Checkout', 'payfull' ); ?>" id="pf_submit">
+            <input type="hidden" value="<?php echo wp_create_nonce(); ?>" id="_wpnonce" name="_wpnonce">
+            <input type="submit" value="<?php echo __( 'Checkout', 'payfull' ); ?>" id="pf_submit" name="woocommerce_pay">
         </div>
         <br><br>
 </form>

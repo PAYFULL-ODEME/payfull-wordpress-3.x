@@ -294,9 +294,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             });
             $errors = $this->validatePaymentForm($data);
             if($errors !== true) {
-                foreach ($errors as $err) {
-                    wc_add_notice($err, 'error');
-                }
+                wc_print_notice( implode('<br>', $errors), 'error');
             } else {
                 $this->sendPayment($order, $data);
             }
@@ -426,10 +424,11 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             return;
         }
 
+
         if($use3d or $data["useBKM"]) {
             if(strpos($response, '<html')===false AND json_decode($response) == null) {
                 $error = $this->getErrorMessage($response,__('Invalid response received.', 'payfull'));
-                wc_add_notice( $error, 'error' );
+                wc_print_notice( $error, 'error' );
                 $order->add_order_note('Could not complete the transaction.' . $error);
                 return;
             }elseif(strpos($response, '<html')!==false){
@@ -439,12 +438,17 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
         }
 
         $response = (@json_decode($response) == null)?$response:json_decode($response,true);
+
         if($this->processPaymentResponse($order, $response)) {
             $message = __('Thank you for shopping with us. Your transaction is succeeded.', 'payfull');
             wc_add_notice($message);
             $thank_url = $order->get_checkout_order_received_url();
             wp_redirect($thank_url);
             exit;
+        }elseif(isset($response['ErrorMSG'])){
+            wc_print_notice( $response['ErrorMSG'], 'error' );
+            $order->add_order_note('Could not complete the transaction.' . $response['ErrorMSG']);
+            return;
         }
     }
 
