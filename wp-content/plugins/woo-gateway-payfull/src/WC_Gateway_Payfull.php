@@ -449,6 +449,11 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             wc_print_notice( $response['ErrorMSG'], 'error' );
             $order->add_order_note('Could not complete the transaction.' . $response['ErrorMSG']);
             return;
+        }else{
+            $message = __('Could not complete the transaction.', 'payfull');
+            wc_print_notice( $message, 'error' );
+            $order->add_order_note('Could not complete the transaction.');
+            return;
         }
     }
 
