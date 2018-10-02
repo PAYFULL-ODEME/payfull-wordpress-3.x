@@ -19,7 +19,7 @@ $not_supported_img_path = plugins_url( 'images/payfull_creditcard_not_supported.
 #cardPaymentMethod{display:none;padding:6px 12px;border:1px solid #ccc;border-top:none}
 #bkmPaymentMethod{display:none;border:1px solid #ccc}
 #bkmPaymentMethod p{padding:8px;margin:0}
-#woo_gateway_payfull-card-holder{box-sizing:border-box;width:100%}
+#payfull-card-holder{box-sizing:border-box;width:100%}
 .pf_dates_div{margin-top: 20px}
 #pf_month_select_div,#pf_year_select_div{float:left;width:49%;margin-right:1%}
 #pf_month_p,#pf_year_p{width:100%}
@@ -30,13 +30,13 @@ $not_supported_img_path = plugins_url( 'images/payfull_creditcard_not_supported.
 .install_body_label.installment_radio{width:10%;height:40px;text-align:center;line-height:40px}
 .install_body_label{float:left;width:30%;height:40px;text-align:center;border-bottom:1px solid #d2d2d2;line-height:40px}
 .installment_body,.installment_footer{clear:both}
-#pf_submit_div{width:100%;text-align:center;margin-top:15px}
-#pf_submit{margin:0;padding:1em 2em;display:inline-block;background-color:#222;border:0;border-radius:2px;box-shadow:none;color:#fff;cursor:pointer;font-size:.875rem;font-weight:800;line-height:1;text-shadow:none;transition:background .2s;-webkit-appearance:button;overflow:visible;box-sizing:inherit;align-items:flex-start;text-align:center;user-select:none;white-space:pre;letter-spacing:normal;word-spacing:normal;text-transform:none;text-indent:0}
+#pf_submit_div{width:100%;text-align:right;margin-top:15px}
+#pf_submit{margin:0;padding:1em 2em;display:inline-block;background-color:#222;border:0;border-radius:2px;box-shadow:none;color:#fff;cursor:pointer;font-weight:800;line-height:1;text-shadow:none;transition:background .2s;-webkit-appearance:button;overflow:visible;box-sizing:inherit;align-items:flex-start;text-align:center;user-select:none;white-space:pre;letter-spacing:normal;word-spacing:normal;text-transform:none;text-indent:0}
 .bkmImage{height:100%!important}
 .bkmTab{padding:2px!important}
 .formTitle{margin-bottom:14px;border:2px solid #ccc;padding:8px;background-color:#ccc}
 #titleText{margin:0 auto;padding:0;display:inline-block;vertical-align:middle;font-size:19px}
 #payfullImageOnly{vertical-align:middle;display: inline-block}
 #pf_cc_number_label,#pf_cvc_label{display: block}
-#woo_gateway_payfull-card-number,#woo_gateway_payfull-card-cvc{width: 100%}
+#payfull-card-number,#payfull-card-cvc{width: 100%}
 </style>
