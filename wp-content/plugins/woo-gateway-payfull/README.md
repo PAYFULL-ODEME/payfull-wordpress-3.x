@@ -1,9 +1,9 @@
 === Payfull Payment Gateway ===
 Tags: payment, payments, credit card, debit card
 Requires at least: 4.0
-Tested up to: 4.9.1
-Stable tag: 4.7.3
-License URI: https://www.payfull.com
+Tested up to: 4.9.8
+Stable tag: 4.9.8
+License URI: https://payfull.com
 
 Türkiye\'deki Tüm Bankalar, BKM Express ve Diğer Ödeme Altyapıları Sanal Pos Entegrasyonu
 

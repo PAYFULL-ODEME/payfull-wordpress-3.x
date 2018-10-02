@@ -1,12 +1,9 @@
 <?php
 
 class WC_Gateway_Payfull extends WC_Payment_Gateway {
-
     const INSTALLMENTS_TYPE_TABLE = "table";
     const INSTALLMENTS_TYPE_LIST = "list";
-
     protected static $_instance = null;
-
     private $_payfull;
     public $username = null;
     public $password = null;
@@ -236,8 +233,8 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
                 'result' => 'success',
                 'redirect' => add_query_arg(
                     array(
-                        'order' => $order->id,
-                        'key' => $order->order_key,
+                        'order-pay' => $order->get_id(),
+                        'key' => $order->get_order_key(),
                     ),
                     $checkout_payment_url
                 ),
@@ -255,7 +252,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
         $order = wc_get_order($order_id);
 
         if($order) {
-            $xid = get_post_meta( $order->id, '_payfull_transaction_id', true );
+            $xid = get_post_meta( $order_id, '_payfull_transaction_id', true );
 
             if(empty($xid)) {
                 $order->add_order_note(__('Can not refund this order because the transaction id is missing.', 'payfull'));
@@ -277,7 +274,8 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
     }
 
     public function receipt_page($order_id) {
-        $order = new WC_Order(isset($order_id) ? $order_id : false);
+        $o = new WC_Order;
+        $order = wc_get_order(isset($order_id) ? $order_id : false);
 
         if($order===false) {
             throw new \Exception('Invalid request, the order is not recognized.');
@@ -350,20 +348,15 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             $installments = $installments <=0 ? 1 : $installments;
         }
 
-        $fname  = @$order->billing_first_name;
-        $lname  = @$order->billing_last_name;
-        $oId    = @$order->id;
-        $oEmail = @$order->billing_email;
-        $oPhone = @$order->billing_phone;
-
-
+        $fname = $order->get_billing_first_name();
+        $lname = $order->get_billing_last_name();
         $order->update_status('wc-pending', 'Process payment by Payfull');
 
         $request = [
             'total'                 => $order->get_total(),
             'currency'              => $order->get_currency(),
             'installments'          => $installments,
-            'passive_data'          => $oId,//json_encode(['order-id' => $order->id]),
+            'passive_data'          => $order->get_id(),//json_encode(['order-id' => $order->id]),
             'cc_name'               => $card['holder'],
             'cc_number'             => str_replace(' ', '', $card['pan']),
             'cc_month'              => $card['month'],
@@ -371,9 +364,9 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             'cc_cvc'                => $card['cvc'],
             'customer_firstname'    => $fname,
             'customer_lastname'     => $lname,
-            'customer_email'        => $oEmail,
-            'customer_phone'        => $oPhone,
-            'payment_title'         => "{$fname} {$lname} | order $oId | ".$order->get_total().$order->get_currency(),
+            'customer_email'        => $order->get_billing_email(),
+            'customer_phone'        => $order->get_billing_phone(),
+            'payment_title'         => "{$fname} {$lname} | order ".$order->get_id()." | ".$order->get_total().$order->get_currency(),
         ];
 
         $bank_id = isset($data['bank']) ? $data['bank'] : null;
@@ -394,7 +387,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
 
         if($use3d) {
             $checkout_url = $order->get_checkout_payment_url(true);
-            $return_url = add_query_arg(['order-id'=>$oId, 'wc-api'=>'WC_Gateway_Payfull'], $checkout_url);
+            $return_url = add_query_arg(['order-id'=>$order->get_id(), 'wc-api'=>'WC_Gateway_Payfull'], $checkout_url);
 
             $request['use3d'] = 1;
             $request['return_url'] = $return_url;
@@ -410,7 +403,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             $request['installments'] = $this->enable_installment;
             $request['bank_id']      = 'BKMExpress';
             $checkout_url            = $order->get_checkout_payment_url(true);
-            $return_url              = add_query_arg(['order-id'=>$order->id, 'wc-api'=>'WC_Gateway_Payfull'], $checkout_url);
+            $return_url              = add_query_arg(['order-id'=>$order->get_id(), 'wc-api'=>'WC_Gateway_Payfull'], $checkout_url);
             $request['return_url']   = $return_url;
         }
 
@@ -423,7 +416,6 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             wc_add_notice($message, 'error');
             return;
         }
-
 
         if($use3d or $data["useBKM"]) {
             if(strpos($response, '<html')===false AND json_decode($response) == null) {
@@ -438,7 +430,6 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
         }
 
         $response = (@json_decode($response) == null)?$response:json_decode($response,true);
-
         if($this->processPaymentResponse($order, $response)) {
             $message = __('Thank you for shopping with us. Your transaction is succeeded.', 'payfull');
             wc_add_notice($message);
@@ -540,8 +531,12 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
                 return false;
             }
 
-            if($hash != $response['hash'] AND !isset($response['html']) AND $response['use3d'] == 1){
-                $order->add_order_note("Invalid hash code. Faruk");
+            //for sale without 3d there is no hash in response
+            $response['hash'] = isset($response['hash'])?$response['hash']:'';
+
+            //only for 3d response we do hash control
+            if(isset($response['hash']) AND !isset($response['html']) AND $hash != $response['hash'] AND $response['use3d'] == 1){
+                $order->add_order_note("Invalid hash code.");
                 return false;
             }
 
@@ -557,7 +552,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             //$order->reduce_order_stock();
             $order->payment_complete($xid);
             WC()->cart->empty_cart();
-            update_post_meta( $order->id, '_payfull_transaction_id', $xid );
+            update_post_meta( $order->get_id(), '_payfull_transaction_id', $xid );
             return true;
         } else {
             return false;
@@ -648,7 +643,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
         $fee->amount    = $amount;
         $fee->taxable   = false;
         $fee->name      = $installments;
-        $order->add_fee($fee);
+        $order->add_item($fee);
         $order->calculate_totals();
     }
 

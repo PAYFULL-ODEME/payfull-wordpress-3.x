@@ -1,6 +1,7 @@
 <?php
 
 /* @vat $this the instnce of WC_Gateway_Payfull */
+
 wp_enqueue_script( 'wc-credit-card-form' );
 $currency       = $currency_symbol;
 $grandTotal     = $order->get_total();
@@ -73,7 +74,7 @@ $VALS = [
                     <input id="<?php echo $IDS['holder']; ?>" value="<?php echo $VALS['holder']; ?>" class="input-text wc-credit-card-form-card-holder" type="text" maxlength="20" autocomplete="off" placeholder="" name="card[holder]" />
                 </p>
                 <p class="checkout-form-line">
-                    <label id="pf_cc_number_label" for="<?php echo $IDS['pan']; ?>"><?php echo $LBLS['pan']; ?> <span class="required">*</span></label>
+                    <label for="<?php echo $IDS['pan']; ?>"><?php echo $LBLS['pan']; ?> <span class="required">*</span></label>
                     <input value="<?php echo $VALS['pan']; ?>" id="<?php echo $IDS['pan']; ?>" data-value="<?php echo $VALS['pan']; ?>" class="input-text wc-credit-card-form-card-number input-cc-number-not-supported" type="text" maxlength="20" autocomplete="off" placeholder="•••• •••• •••• ••••" name="card[pan]" />
                 </p>
                 <div class="checkout-form-line">
@@ -107,7 +108,7 @@ $VALS = [
 
                 </div>
                 <p class="checkout-form-line">
-                    <label id="pf_cvc_label" for="<?php echo $IDS['cvc']; ?>"><?php echo $LBLS['cvc']; ?> <span class="required">*</span></label>
+                    <label for="<?php echo $IDS['cvc']; ?>"><?php echo $LBLS['cvc']; ?> <span class="required">*</span></label>
                     <input id="<?php echo $IDS['cvc']; ?>" value="<?php echo $VALS['cvc']; ?>" class="input-text wc-credit-card-form-card-cvc" type="text" autocomplete="off" placeholder="CVC" name="card[cvc]" />
                 </p>
                 <?php if($enable_installment) : ?>
@@ -179,8 +180,7 @@ $VALS = [
         <?php //do_action( 'woocommerce_credit_card_form_end', $this->id ); ?>
         <div class="clear"></div>
         <div id="pf_submit_div">
-            <input type="hidden" value="<?php echo wp_create_nonce(); ?>" id="_wpnonce" name="_wpnonce">
-            <input type="submit" value="<?php echo __( 'Checkout', 'payfull' ); ?>" id="pf_submit" name="woocommerce_pay">
+        <input type="submit" value="<?php echo __( 'Checkout', 'payfull' ); ?>" id="pf_submit">
         </div>
         <br><br>
 </form>
@@ -273,6 +273,7 @@ $VALS = [
                         }else if($('#<?php echo $IDS['use3d']; ?>').attr('data-forced') == 'false'){
                             $('#<?php echo $IDS['use3d']; ?>').removeAttr('disabled');
                         }
+
 
                         //show bank image
                         if(bank && bank.length){
@@ -383,8 +384,6 @@ $VALS = [
                     bank = cardIssuer;
                 } else if (member != 'false') {
                     bank = member;
-                } else {
-                    bank.installments = [];
                 }
 
                 if (bank) {
