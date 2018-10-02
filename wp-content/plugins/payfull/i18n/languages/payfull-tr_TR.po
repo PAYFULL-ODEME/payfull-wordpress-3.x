@@ -134,10 +134,6 @@ msgstr "Custom CSS"
 msgid "Failed to process the payment because of invalid order"
 msgstr "Hatalı Sipariş Ödeme Başarısız"
 
-#: src/WC_Gateway_Payfull.php:250
-msgid "Can not refund this order because the transaction id is missing."
-msgstr "İşlem ID Bulunamadığı için İade Başarısız"
-
 #: src/WC_Gateway_Payfull.php:356
 msgid "Invalid installment information."
 msgstr "Geçersiz Taksit Bilgisi"

@@ -1,14 +1,15 @@
 <?php
 
-class PayfullService {
-
+class PayfullService
+{
     public $username;
     public $password;
     public $endpoint;
     public $language;
     public $client_ip;
 
-    public function __construct($config=[]) {
+    public function __construct($config=[])
+    {
         if (!empty($config)) {
             foreach ($config as $name => $value) {
                 if(!property_exists($this, $name)) {
@@ -21,32 +22,29 @@ class PayfullService {
             }
         }
     }
-    
-    public function bin($bin) {
-        return $this->send('Get', [
+
+    public function payfull_bin($bin)
+    {
+        return $this->payfull_send('Get', [
             'get_param' => 'Issuer',
             'bin' => $bin
         ]);
     }
-    
-    public function banks($data = []) {
 
-        $installments = $this->send('Get', [
+    public function payfull_banks($data = [])
+    {
+        $installments = $this->payfull_send('Get', [
             'get_param' => 'Installments',
         ]);
-
-        $installments['oneShotCommission'] = $this->oneShotCommission();
-
+        $installments['oneShotCommission'] = $this->payfull_oneShotCommission();
         $getExtraInstallmentsActive = (isset( $data['getExtraInstallmentsActive']) AND $data['getExtraInstallmentsActive'] )?true:false;
 
-
-
-        if($getExtraInstallmentsActive){
-            $extraInstallmentsList = $this->extraInstallmentsList($data['currency']);
-            if(isset($extraInstallmentsList["data"]["campaigns"])){
-                foreach($extraInstallmentsList["data"]["campaigns"] as $extra_installments_row){
-                    foreach($installments["data"] as $installmentsKey=>$installment_row){
-                        foreach($installment_row['installments'] as $installment_row_inst_key=>$installment_row_inst){
+        if($getExtraInstallmentsActive) {
+            $extraInstallmentsList = $this->payfull_extraInstallmentsList($data['currency']);
+            if(isset($extraInstallmentsList["data"]["campaigns"])) {
+                foreach($extraInstallmentsList["data"]["campaigns"] as $extra_installments_row) {
+                    foreach($installments["data"] as $installmentsKey=>$installment_row) {
+                        foreach($installment_row['installments'] as $installment_row_inst_key=>$installment_row_inst) {
                             if(
                                 $extra_installments_row['bank_id']           == $installment_row['bank'] AND
                                 $extra_installments_row['min_amount']        < ($data['total']*$extraInstallmentsList['data']['exchange_rate']) AND
@@ -55,37 +53,36 @@ class PayfullService {
                                 $extra_installments_row['gateway']           == $installment_row['gateway']
                             ){
                                 $installments["data"][$installmentsKey]['installments'][$installment_row_inst_key]['hasExtra'] = 1;
-                            }else{
+                            } else {
                                 $installments["data"][$installmentsKey]['installments'][$installment_row_inst_key]['hasExtra'] = 0;
                             }
-
                         }
-
                     }
                 }
             }
         }
-
         return $installments;
     }
 
-    public function oneShotCommission() {
-        $oneShotCommission = $this->send('Get', [
+    public function payfull_oneShotCommission()
+    {
+        $oneShotCommission = $this->payfull_send('Get', [
             'get_param'            => 'Installments',
             "one_shot_commission"  => 1
         ]);
 
-        if(isset($oneShotCommission['data']['commission'])){
+        if(isset($oneShotCommission['data']['commission'])) {
             $oneShotCommission = str_replace('%', '', $oneShotCommission['data']['commission']);
-        }else{
+        } else {
             $oneShotCommission = 0;
         }
 
         return $oneShotCommission;
     }
 
-    public function extraInstallments($data) {
-        return $this->send('Get', [
+    public function payfull_extraInstallments($data)
+    {
+        return $this->payfull_send('Get', [
             'get_param'       => 'ExtraInstallments',
             "total"           => $data['total'],
             "currency"        => $data['currency'],
@@ -95,34 +92,32 @@ class PayfullService {
         ]);
     }
 
-    public function extraInstallmentsList($currency = false) {
-        if($currency){
-            return $this->send('Get', [
+    public function payfull_extraInstallmentsList($currency = false)
+    {
+        if($currency) {
+            return $this->payfull_send('Get', [
                 'get_param'       => 'ExtraInstallmentsList',
                 "exchange_rate"   => '1',
                 "currency"        => $currency,
             ]);
-        }else{
-            return $this->send('Get', [
+        } else {
+            return $this->payfull_send('Get', [
                 'get_param'       => 'ExtraInstallmentsList',
             ]);
         }
-
     }
 
-    public function getCommission($amount, $bankId, $installmentCount) {
+    public function payfull_getCommission($amount, $bankId, $installmentCount)
+    {
         if($installmentCount===1) {
-            return $this->oneShotCommission();
+            return $this->payfull_oneShotCommission();
         }
 
         $bankId = strtolower($bankId);
-
-        $banks = $this->banks();
-
-
+        $banks = $this->payfull_banks();
         $valid = isset($banks['status'], $banks['data']) && $banks['status'] && is_array($banks['data']);
         if(!$valid) { return 0; }
-        
+
         foreach ($banks['data'] as $b) {
             if(strtolower($b['bank']) === $bankId) {
                 $installments = isset($b['installments']) ? $b['installments'] : null;
@@ -138,34 +133,29 @@ class PayfullService {
         }
         return 0;
     }
-    
-    public function refund($transaction_id, $amount) {
-        return $this->send('Return', [
-            'transaction_id' => $transaction_id,
-            'total' => $amount
-        ]);
-    }
-    
-    public function send($op, $data, $return_json=true) {
 
+    public function payfull_send($op, $data, $return_json=true)
+    {
         if(empty($this->client_ip)) {
             $this->client_ip = $_SERVER['REMOTE_ADDR'] ;
         }
 
-        $data['type'] = $op;
-        $data['merchant'] = $this->username;
-        $data['language'] = $this->language;
-        $data['client_ip'] = $this->client_ip;
-        $data['hash'] = $this->hash($data);
-        $content = self::post($this->endpoint, $data);
+        $data['type']       = $op;
+        $data['merchant']   = $this->username;
+        $data['language']   = $this->language;
+        $data['client_ip']  = $this->client_ip;
+        $data['hash']       = $this->payfull_hash($data);
+        $content            = self::payfull_post($this->endpoint, $data);
 
         if($return_json){
             return json_decode($content, true);
         }
+
         return $content;
     }
-    
-    private function hash($data) {
+
+    private function payfull_hash($data)
+    {
         $message = '';
         ksort($data);
         foreach($data as $key=>$value) {
@@ -173,11 +163,12 @@ class PayfullService {
             if($l) $message .= $l . $value;
         }
         $hash = hash_hmac('sha1', $message, $this->password);
-        
+
         return $hash;
     }
-    
-    public static function post($url, $data=array()) {
+
+    public static function payfull_post($url, $data=array())
+    {
         $options = array(
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => true,
@@ -195,15 +186,17 @@ class PayfullService {
         curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($data));
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+
         $content  = curl_exec($curl);
         $error = curl_error($curl);
         curl_close($curl);
 
         if($content === false) {
-            throw new Exception(strtr('Error occured in sending data to ASSECO: {error}', array(
+            throw new Exception(strtr('Error occured in sending data: {error}', array(
                 '{error}' => $error,
             )));
         }
+
         return $content;
     }
 
