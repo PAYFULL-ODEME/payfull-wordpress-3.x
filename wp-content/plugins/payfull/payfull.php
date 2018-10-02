@@ -5,7 +5,7 @@
  *  Description: Integrate PayFull payment service with WooCommerce checkout
  *  Text Domain: payfull
  *  Domain Path: /i18n/languages/
- *  Version: 1.0.0
+ *  Version: 1.1.0
  *  Author: Faruk Cinemre
  *  Author URI: https://payfull.com
  * */

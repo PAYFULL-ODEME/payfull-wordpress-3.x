@@ -211,7 +211,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway {
             'custom_css' => [
                 'title' => __('Custom Css', 'payfull'),
                 'type' => 'textarea',
-                'default' => file_get_contents (WP_PLUGIN_DIR. '/woo-gateway-payfull/assets/custom.css'),
+                'default' => file_get_contents (WP_PLUGIN_DIR. '/payfull/assets/custom.css'),
             ],
         ];
     }
