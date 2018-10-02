@@ -6,7 +6,7 @@
  *  Text Domain: payfull
  *  Domain Path: /i18n/languages/
  *  Version: 1.1.0
- *  Author: Faruk Cinemre
+ *  Author: Muhammed Alabed
  *  Author URI: https://payfull.com
  * */
 
