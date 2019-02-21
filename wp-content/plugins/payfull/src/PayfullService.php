@@ -164,6 +164,7 @@ class PayfullService
             $message .= mb_strlen((string)$value) . $value;
         }
         $hash = strtolower(hash_hmac('sha256',  $message, $this->password));
+        return $hash;
     }
 
     public static function payfull_post($url, $data=array())
