@@ -498,6 +498,7 @@ class WC_Gateway_Payfull extends WC_Payment_Gateway
             $message .= mb_strlen((string)$value) . $value;
         }
         $hash = strtolower(hash_hmac('sha256',  $message, $this->password));
+        return $hash;
     }
 
     protected function payfull_processPaymentResponse($order, $response)
