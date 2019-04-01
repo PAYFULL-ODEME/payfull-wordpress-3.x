@@ -82,7 +82,7 @@ $VALS = [
                 </label>
                 <input id="<?php echo $IDS['holder']; ?>" value="<?php echo $VALS['holder']; ?>"
                        class="input-text wc-credit-card-form-card-holder" type="text"
-                       maxlength="20" autocomplete="off" placeholder="" name="card[holder]" />
+                       maxlength="40" autocomplete="off" placeholder="" name="card[holder]" />
             </p>
             <p class="checkout-form-line">
                 <label id="pf_cc_number_label" for="<?php echo $IDS['pan']; ?>"><?php echo $LBLS['pan']; ?>
