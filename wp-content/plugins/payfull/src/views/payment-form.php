@@ -221,7 +221,7 @@ $VALS = [
                 bin: false,
                 banks: [],
                 total: parseFloat('<?php echo $grandTotal;?>'),
-                currency: "<?php echo $currency;?>",
+                currency: '<?php echo $currency;?>',
                 totalSelector: "<?php echo $total_selector;?>",
                 currencyClass: "<?php echo $currency_class;?>",
                 oneShotCommission: 0,
@@ -515,7 +515,7 @@ $VALS = [
                 bin: false,
                 banks: [],
                 total: parseFloat('<?php echo $grandTotal;?>'),
-                currency: "<?php echo $currency;?>",
+                currency: '<?php echo $currency;?>',
                 totalSelector: "<?php echo $total_selector;?>",
                 currencyClass: "<?php echo $currency_class;?>",
 
